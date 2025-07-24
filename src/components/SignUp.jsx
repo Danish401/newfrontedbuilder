@@ -19,7 +19,10 @@ import axios from "axios"; // Import axios
 import { useState, useEffect } from "react";
 import { useLocation } from 'react-router-dom';
 import { toast ,ToastContainer} from 'react-toastify';
-
+const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
 const SignUp = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -79,7 +82,7 @@ const SignUp = () => {
     try {
       // Make a POST request to the backend to create the user
       const response = await axios.post(
-        "http://localhost:5000/signup",
+        `${BACKEND_URL}/signup`,
         {
           name: name,
           email,

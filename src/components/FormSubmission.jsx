@@ -57,12 +57,15 @@ const FormSubmission = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const responseContentRef = useRef(null);
-
+  const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
   // Load form data
   useEffect(() => {
     const loadForm = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`);
+        const response = await axios.get(`${BACKEND_URL}/api/forms/${formId}`);
         setForm(response.data);
         
         // Initialize form data with empty values
@@ -201,7 +204,7 @@ const FormSubmission = () => {
         };
       });
 
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/submit-form/${formId}`, {
+      const response = await axios.post(`${BACKEND_URL}/api/submit-form/${formId}`, {
         formId,
         answers,
         submittedAt: new Date().toISOString()

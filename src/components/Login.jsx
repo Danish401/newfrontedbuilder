@@ -22,6 +22,11 @@ import axios from "axios"; // Import axios
 import ForgotPassword from "./ForgotPassword";
 import { loginStart, loginSuccess, loginFailure } from '../features/authSlice'; 
 import { notifySuccess, notifyError } from './ToastNotification';
+const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
+
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -75,149 +80,7 @@ const Login = () => {
     return valid;
   };
 
-  // Handle form submission
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
-
-  //   // Validate inputs before submission
-  //   if (!validateInputs()) return;
-
-  //   try {
-  //     // Make a POST request to the backend to login the user
-  //     const response = await axios.post(
-  //       "http://localhost:5000/api/auth/login",
-  //       { email, password }
-  //     );
-
-  //     console.log("Login successful", response.data);
-  //     // Redirect to the dashboard on success
-  //     navigate("/");
-  //   } catch (error) {
-  //     console.error("Login failed", error.response?.data || error.message);
-  //     setEmailError(true);
-  //     setEmailErrorMessage("Invalid credentials");
-  //   }
-  // };
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
-
-  //   // Validate inputs before submission
-  //   if (!validateInputs()) return;
-
-  //   try {
-  //     // Make a POST request to the backend to login the user
-  //     const response = await axios.post(
-  //       "http://localhost:5000/api/auth/login",
-  //       { email, password }
-  //     );
-
-  //     console.log("Login successful", response.data);
-
-  //     // Set user data from the response
-  //     setUserData(response.data.user);
-
-  //     // Optionally, store the token if needed
-  //     localStorage.setItem("token", response.data.token);
-
-  //     // Redirect to the dashboard on success
-  //     navigate("/");
-  //   } catch (error) {
-  //     console.error("Login failed", error.response?.data || error.message);
-  //     setEmailError(true);
-  //     setEmailErrorMessage("Invalid credentials");
-  //   }
-  // };
-
-// const handleSubmit = async (event) => {
-//   event.preventDefault();
-
-//   // Validate inputs before submission
-//   if (!validateInputs()) return;
-
-//   try {
-//     // Make a POST request to the backend to login the user
-//     const response = await axios.post("http://localhost:5000/login", {
-//       email,
-//       password,
-//     });
-
-//     // Check if the response contains the user and token
-//     if (response.data && response.data.user) {
-//       // Store user data in local storage
-//       const { user } = response.data;
-//       localStorage.setItem("user", JSON.stringify(user));
-
-//       // Set user data in state (optional)
-//       setUserdata(user);
-
-//       console.log("Login successful", response.data);
-
-//       // Redirect to the dashboard or home page on success
-//       navigate("/");
-//     } else {
-//       // Handle the case where login fails but no specific error is provided
-//       console.log("Login failed: No user data found");
-//       setEmailError(true);
-//       setEmailErrorMessage("Login failed");
-//     }
-//   } catch (error) {
-//     console.error("Login failed:", error.response ? error.response.data : error.message);
-
-//     // Set error state for displaying error message
-//     setEmailError(true);
-//     setEmailErrorMessage("Invalid credentials");
-//   }
-// };
-//work fine 
-// const handleSubmit = async (event) => {
-//   event.preventDefault();
-
-//   // Validate inputs before submission
-//   if (!validateInputs()) return;
-
-//   try {
-//     dispatch(loginStart()); // Dispatch loginStart action
-
-//     // Make a POST request to the backend to login the user
-//     const response = await axios.post("http://localhost:5000/login", {
-//       email,
-//       password,
-//     });
-
-//     // Check if the response contains the user and token
-//     if (response.data && response.data.user && response.data.token) {
-//       const { user, token } = response.data;
-
-//       // Store user data and token in Redux
-//       dispatch(loginSuccess({ user, token }));
-
-//       // Optionally, store the token in localStorage for persistence
-//       localStorage.setItem("token", token);
-//       localStorage.setItem("user", JSON.stringify(user));
-
-//       console.log("Login successful", response.data);
-
-//       // Redirect to the dashboard or home page on success
-//       navigate("/");
-//     } else {
-//       // Handle the case where login fails but no specific error is provided
-//       console.log("Login failed: No user data found");
-//       dispatch(loginFailure("Login failed: No user data found"));
-//       setEmailError(true);
-//       setEmailErrorMessage("Login failed");
-//     }
-//   } catch (error) {
-//     console.error("Login failed:", error.response ? error.response.data : error.message);
-
-//     // Dispatch loginFailure with error message
-//     const errorMsg = error.response?.data?.message || "Invalid credentials";
-//     dispatch(loginFailure(errorMsg));
-
-//     // Set error state for displaying error message
-//     setEmailError(true);
-//     setEmailErrorMessage(errorMsg);
-//   }
-// };
+ 
 const handleSubmit = async (event) => {
   event.preventDefault();
 
@@ -228,7 +91,7 @@ const handleSubmit = async (event) => {
     dispatch(loginStart()); // Dispatch loginStart action
 
     // Make a POST request to the backend to login the user
-    const response = await axios.post("http://localhost:5000/login", {
+    const response = await axios.post(`${BACKEND_URL}/login`, {
       email,
       password,
     });

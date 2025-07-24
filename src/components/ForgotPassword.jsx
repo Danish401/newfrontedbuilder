@@ -42,11 +42,14 @@ const ForgotPassword = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const navigate = useNavigate();
-
+  const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
   const handleSendOtp = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/forgotpassword",
+        `${BACKEND_URL}/api/forgotpassword`,
         { email }
       );
       setSnackbarMessage(response.data.message);
@@ -61,7 +64,7 @@ const ForgotPassword = () => {
   const handleResetPassword = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/resetpassword",
+        `${BACKEND_URL}/api/resetpassword`,
         {
           email,
           otp,

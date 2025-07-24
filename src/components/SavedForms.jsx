@@ -29,7 +29,10 @@ const genoa = {
   900: '#21403e',
   950: '#0f2424',
 };
-
+const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
 const SavedForms = () => {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +74,7 @@ const SavedForms = () => {
     );
     
     try {
-      await axios.delete(`http://localhost:5000/api/forms/${id}`);
+      await axios.delete(`${BACKEND_URL}/api/forms/${id}`);
       setForms(prevForms => prevForms.filter(form => form.id !== id));
       toast.update(toastId, {
         render: "Form deleted successfully!",
@@ -110,7 +113,7 @@ const SavedForms = () => {
         name: `${formToDuplicate.name} (Copy)`,
       };
       
-      const response = await axios.post('http://localhost:5000/api/forms', duplicatedForm);
+      const response = await axios.post(`${BACKEND_URL}/api/forms`, duplicatedForm);
       
       setForms(prevForms => [...prevForms, response.data.newForm]);
       

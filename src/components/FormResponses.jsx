@@ -35,7 +35,10 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { useSelector } from 'react-redux';
-
+const BACKEND_URL =
+process.env.NODE_ENV === "production"
+  ? "https://newbackendformbuilder.onrender.com"
+  : "http://localhost:5000";
 const templateComponents = [
   Template1,
   Template2,
@@ -78,18 +81,18 @@ const FormResponses = () => {
         // Try public endpoint first
         let formResponse = null;
         try {
-          formResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/forms/public/${formId}`);
+          formResponse = await axios.get(`${BACKEND_URL}/api/forms/public/${formId}`);
         } catch (err) {
           // If not public, fallback to private endpoint with userId
-          let url = `${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`;
+          let url = `${BACKEND_URL}/api/forms/${formId}`;
           if (userId) url += `?userId=${userId}`;
           formResponse = await axios.get(url);
         }
         setForm(formResponse.data);
         // Now fetch responses
         let responsesUrl = formResponse.data.isPublic
-          ? `${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}/responses`
-          : `${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}/responses${userId ? `?userId=${userId}` : ''}`;
+          ? `${BACKEND_URL}/api/forms/${formId}/responses`
+          : `${BACKEND_URL}/api/forms/${formId}/responses${userId ? `?userId=${userId}` : ''}`;
         const responsesResponse = await axios.get(responsesUrl);
         setResponses(responsesResponse.data);
       } catch (err) {
@@ -122,7 +125,7 @@ const FormResponses = () => {
     setConfirmOpen(false);
     if (!pendingDeleteId) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/responses/${pendingDeleteId}`);
+      await axios.delete(`${BACKEND_URL}/api/responses/${pendingDeleteId}`);
       setResponses(prev => prev.filter(r => r._id !== pendingDeleteId));
       toast.success('Response deleted successfully');
     } catch (error) {

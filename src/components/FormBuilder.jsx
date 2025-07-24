@@ -225,7 +225,10 @@ const reorderFields = (fields, startIndex, endIndex) => {
   result.splice(endIndex, 0, removed);
   return result;
 };
-
+const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
 const FormBuilder = () => {
   const { formId } = useParams();
   const dispatch = useDispatch();
@@ -300,7 +303,7 @@ const FormBuilder = () => {
     setHoveredField(null);
   };
   const copyToClipboard = () => {
-    const link = `http://localhost:3000/form/${formId}`;
+    const link = `${BACKEND_URL}/form/${formId}`;
     navigator.clipboard
       .writeText(link)
       .then(() => {
@@ -402,7 +405,7 @@ const FormBuilder = () => {
 
       console.log("Saving Form Data:", formData);
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/forms`, {
+      const response = await fetch(`${BACKEND_URL}/api/forms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

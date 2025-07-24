@@ -28,7 +28,10 @@ import PublicTemplate2Form from "./components/PublicTemplate2Form";
 import ForceTemplate2Submission from "./components/ForceTemplate2Submission";
 import ForceTemplateSubmission from "./components/ForceTemplateSubmission";
 // import About from "./components/About";
-
+const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
 // Component to sync forms with backend
 const FormSync = () => {
   const dispatch = useDispatch();
@@ -36,7 +39,7 @@ const FormSync = () => {
   useEffect(() => {
     const syncForms = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/forms`);
+        const response = await axios.get(`${BACKEND_URL}/api/forms`);
         // Clear existing forms first
         dispatch(clearForms());
         // Add all forms from backend

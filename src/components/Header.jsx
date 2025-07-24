@@ -14,7 +14,10 @@ import axios from "axios";
 import p from "../assets/images/profile.png"
 import LogoutIcon from '@mui/icons-material/Logout';
 import { logout1 } from '../features/authSlice'; // Adjust the path accordingly
-
+const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
 function Header() {
   const { formId } = useParams();
   const navigate = useNavigate();
@@ -26,7 +29,7 @@ function Header() {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const getUser = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/login/success`, { withCredentials: true });
+      const response = await axios.get(`${BACKEND_URL}/login/success`, { withCredentials: true });
       console.log("Response from /login/success:", response.data); // Add this line
       if (response.data.user) {
         setUserdata(response.data.user); // Set userdata for both login methods
@@ -41,7 +44,7 @@ function Header() {
   
   const logout = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/logout", { withCredentials: true });
+      const response = await axios.get(`${BACKEND_URL}/logout`, { withCredentials: true });
       if (response.status === 200) {
         localStorage.removeItem("token");
         document.cookie = "token=; Max-Age=0; path=/;";

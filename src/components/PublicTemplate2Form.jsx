@@ -9,7 +9,10 @@ const template2Fields = [
   // Removed 'feedback' and other written text fields
   // Add more fields as per your Template2 definition
 ];
-
+const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
 const PublicTemplate2Form = () => {
   const [values, setValues] = useState({});
   const [validationErrors, setValidationErrors] = useState({});
@@ -38,7 +41,7 @@ const PublicTemplate2Form = () => {
     setIsSubmitting(true);
     try {
       // Replace with your backend endpoint
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/forms/template2/submit`, values);
+      await axios.post(`${BACKEND_URL}/api/forms/template2/submit`, values);
       setSubmitted(true);
     } catch (error) {
       setValidationErrors({ form: 'Submission failed. Please try again.' });

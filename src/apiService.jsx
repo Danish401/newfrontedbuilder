@@ -1,6 +1,9 @@
 import axios from 'axios';
-
-const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api/forms`;
+const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
+const API_URL = `${BACKEND_URL}/api/forms`;
 
 export const fetchForms = async () => {
   try {

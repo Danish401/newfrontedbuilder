@@ -169,7 +169,10 @@ const IconButton = ({
     </div>
   );
 };
-
+const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
 const Preview = () => {
   const { formId } = useParams();
   const dispatch = useDispatch();
@@ -206,7 +209,7 @@ const Preview = () => {
     if (formId) {
       // Fetch form data from backend using formId
       axios
-        .get(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`)
+        .get(`${BACKEND_URL}/api/forms/${formId}`)
         .then((response) => {
           dispatch(loadForm(response.data));
           setFormName(response.data.name);
@@ -291,7 +294,7 @@ const Preview = () => {
       console.log("Saving Form Data:", formData);
 
       // Fetch request to save the form data
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/forms`, {
+      const response = await fetch(`${BACKEND_URL}/api/forms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -93,5 +93,6 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.15",
     "vite": "^5.2.0"
-  }
+  },
+  "proxy": "https://newbackendformbuilder.onrender.com"
 }

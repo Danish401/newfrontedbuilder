@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import Template2 from '../templates/Template2';
-
+const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
 const ForceTemplate2Submission = () => {
   const { formId } = useParams();
   const [form, setForm] = useState(null);
@@ -16,7 +19,7 @@ const ForceTemplate2Submission = () => {
   useEffect(() => {
     const fetchForm = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/forms/public/${formId}`);
+        const response = await axios.get(`${BACKEND_URL}/api/forms/public/${formId}`);
         setForm(response.data);
         // Initialize form data
         const initialData = {};
@@ -74,7 +77,7 @@ const ForceTemplate2Submission = () => {
     if (Object.keys(errors).length > 0) return;
     setIsSubmitting(true);
     try {
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/submit-form/${formId}`, {
+      await axios.post(`${BACKEND_URL}/api/submit-form/${formId}`, {
         formId,
         answers: Object.entries(formData).map(([fieldId, value]) => ({ fieldId, value })),
         submittedAt: new Date().toISOString()

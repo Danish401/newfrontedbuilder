@@ -392,13 +392,16 @@ const ViewForm = () => {
   const userId = useSelector((state) => state.auth.user?._id || state.auth.user?.id);
   const [isPublic, setIsPublic] = useState(false);
   const [expirationDateTime, setExpirationDateTime] = useState("");
-
+  const BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://newbackendformbuilder.onrender.com"
+    : "http://localhost:5000";
   // Fetch form data from backend
   useEffect(() => {
     const fetchForm = async () => {
       try {
         setLoading(true);
-        let url = `${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`;
+        let url = `${BACKEND_URL}/api/forms/${formId}`;
         if (userId) {
           url += `?userId=${userId}`;
         }
@@ -440,7 +443,7 @@ const ViewForm = () => {
     
     setSaving(true);
     try {
-      const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`, editedForm);
+      const response = await axios.put(`${BACKEND_URL}/api/forms/${formId}`, editedForm);
       setForm(response.data.updatedForm);
       setEditedForm(response.data.updatedForm);
       setIsEditMode(false);
@@ -455,7 +458,12 @@ const ViewForm = () => {
 
   // Generate shareable link
   const generateShareLink = () => {
-    const baseUrl = window.location.origin;
+    let baseUrl;
+    if (process.env.NODE_ENV === "production") {
+      baseUrl = "https://createanytypeform.netlify.app";
+    } else {
+      baseUrl = window.location.origin;
+    }
     if (selectedTemplate && selectedTemplate > 1) {
       return `${baseUrl}/form/submit/templateid${selectedTemplate}/${formId}`;
     }
