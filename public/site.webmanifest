@@ -2,6 +2,7 @@
   "name": "Buildly",
   "short_name": "Buildly",
   "start_url": ".",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#eedcdc",
   "theme_color": "#f0dbdb",
