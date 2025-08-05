@@ -1221,4 +1221,9 @@ const FormBuilder = () => {
   )
 };
 
+<<<<<<< HEAD
 export default FormBuilder;
+=======
+export default FormBuilder;
+//
+>>>>>>> 9c9df03eb0672db0f4f30e499f55c34a06992bb6
