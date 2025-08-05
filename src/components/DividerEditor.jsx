@@ -5,7 +5,7 @@ import { updateDivider } from '../features/formSlice';
 const DividerEditor = ({ field, onClose }) => {
   const dispatch = useDispatch();
   const [localField, setLocalField] = useState({
-    label: field?.label || 'Divider',
+   
     color: field?.color || '#000000',
     thickness: field?.thickness || 1,
     width: field?.width || '100%',
@@ -16,7 +16,7 @@ const DividerEditor = ({ field, onClose }) => {
 
   useEffect(() => {
     setLocalField({
-      label: field?.label || 'Divider',
+   
       color: field?.color || '#000000',
       thickness: field?.thickness || 1,
       width: field?.width || '100%',

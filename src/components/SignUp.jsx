@@ -209,7 +209,7 @@ const SignUp = () => {
           </Button>
         </form>
         <Divider sx={{ mt: 2, mb: 2 }}>or</Divider>
-        <Button
+        {/* <Button
           variant="outlined"
           fullWidth
           startIcon={<GoogleIcon />}
@@ -217,7 +217,7 @@ const SignUp = () => {
           onClick={handleGoogleSignup}
         >
           Sign Up with Google
-        </Button>
+        </Button> */}
         <Typography
           variant="body2"
           align="center"

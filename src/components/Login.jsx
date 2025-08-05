@@ -240,7 +240,7 @@ const handleGoogleSignup = async () => {
         </Box>
 
         <Divider sx={{ mt: 2, mb: 2 }}>or</Divider>
-        <Button
+        {/* <Button
           variant="outlined"
           fullWidth
           startIcon={<GoogleIcon />}
@@ -248,7 +248,7 @@ const handleGoogleSignup = async () => {
           onClick={handleGoogleSignup}
         >
           Log In with Google
-        </Button>
+        </Button> */}
         <Typography variant="body2" align="center" sx={{ mt: 2 }}>
           Don't have an account?
           <Button
