@@ -152,11 +152,11 @@ const SidebarIconButton = ({
 }) => {
   return (
     <motion.div
-      className={`relative flex items-center w-full rounded-xl cursor-pointer transition-all duration-300 mb-2 group ${
+      className={`relative flex items-center w-full rounded-xl cursor-pointer transition-all duration-300 mb-2 mt-2 group ${
         isMobile ? "p-2" : "p-4"
       } ${
         isActive
-          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg "
           : "bg-white hover:bg-blue-50 text-gray-600 hover:text-blue-600 shadow-sm hover:shadow-md"
       }`}
       onClick={onClick}
@@ -167,26 +167,20 @@ const SidebarIconButton = ({
       <div
         className={`flex items-center justify-center rounded-lg transition-all duration-300 ${
           isMobile ? "w-8 h-8 mr-2" : "w-10 h-10 mr-3"
-        } ${
-          isActive ? "bg-white/20" : "bg-blue-50 group-hover:bg-blue-100"
-        }`}
+        } ${isActive ? "bg-white/20" : "bg-blue-50 group-hover:bg-blue-100"}`}
       >
         {icon ? (
           <FontAwesomeIcon
             icon={icon}
             className={`transition-all duration-300 ${
               isMobile ? "text-sm" : "text-lg"
-            } ${
-              isActive ? "text-white" : "text-blue-600"
-            }`}
+            } ${isActive ? "text-white" : "text-blue-600"}`}
           />
         ) : (
           <div
             className={`transition-all duration-300 ${
               isMobile ? "text-sm" : "text-lg"
-            } ${
-              isActive ? "text-white" : "text-blue-600"
-            }`}
+            } ${isActive ? "text-white" : "text-blue-600"}`}
           >
             {iconComponent}
           </div>
@@ -260,11 +254,11 @@ const FormBuilder = () => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const splitFieldsByPage = (fields) => {
@@ -989,10 +983,10 @@ const FormBuilder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Mobile Header */}
-      <div className="lg:hidden bg-white border-b border-gray-200 p-4 fixed top-0 left-0 right-0 z-50 shadow-sm">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 mt-6">
+      {/* Mobile Header - Fixed positioning */}
+      <div className="lg:hidden bg-white border-b border-gray-200 p-4 fixed top-0 left-0 right-0 z-50 shadow-sm h-16">
+        <div className="flex items-center justify-between h-full">
           <button
             onClick={() => setShowMobileSidebar(true)}
             className="flex items-center justify-center w-10 h-10 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200"
@@ -1071,7 +1065,7 @@ const FormBuilder = () => {
         )}
       </AnimatePresence>
 
-      {/* Main Layout Container */}
+      {/* Main Layout Container - Added proper top padding for mobile */}
       <div className="flex h-screen pt-16 lg:pt-0">
         {/* Desktop Left Sidebar - Field Types */}
         <div className="hidden lg:flex flex-col bg-white border-r border-gray-200 shadow-xl w-80 xl:w-96">
@@ -1124,8 +1118,11 @@ const FormBuilder = () => {
             </div>
           </div>
 
-          {/* Form Content */}
-          <div className="flex-1 p-4 lg:p-6 overflow-y-auto">
+          {/* Form Content - Adjusted height calculation for mobile */}
+          <div
+            className="flex-1 p-4 lg:p-6 overflow-y-auto"
+            style={{ height: isMobile ? "calc(100vh - 16rem)" : "auto" }}
+          >
             <div className="max-w-4xl mx-auto">
               {/* Form Fields */}
               <div className="space-y-4 md:space-y-6">
@@ -1290,10 +1287,9 @@ const FormBuilder = () => {
                       No fields added yet
                     </h3>
                     <p className="text-gray-500 text-sm md:text-base px-4">
-                      {isMobile 
+                      {isMobile
                         ? "Tap the menu button to add form elements"
-                        : "Select elements from the left panel to start building your form"
-                      }
+                        : "Select elements from the left panel to start building your form"}
                     </p>
                   </div>
                 )}
@@ -1307,7 +1303,8 @@ const FormBuilder = () => {
                     onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
                     disabled={currentPage === 0}
                   >
-                    ← <span className="hidden sm:inline">Previous</span><span className="sm:hidden">Prev</span>
+                    ← <span className="hidden sm:inline">Previous</span>
+                    <span className="sm:hidden">Prev</span>
                   </button>
                   <span className="font-medium text-gray-700 text-sm md:text-base px-2">
                     Page {currentPage + 1} of {totalPages}
@@ -1319,7 +1316,8 @@ const FormBuilder = () => {
                     }
                     disabled={currentPage === totalPages - 1}
                   >
-                    <span className="hidden sm:inline">Next</span><span className="sm:hidden">Next</span> →
+                    <span className="hidden sm:inline">Next</span>
+                    <span className="sm:hidden">Next</span> →
                   </button>
                 </div>
               )}
@@ -1353,14 +1351,14 @@ const FormBuilder = () => {
                 ? "fixed inset-0 z-50 bg-white flex flex-col"
                 : "flex flex-col bg-white border-l border-gray-200 shadow-xl w-80 xl:w-96"
             }`}
-            initial={{ 
-              x: isMobile ? "100%" : 300, 
-              opacity: 0 
+            initial={{
+              x: isMobile ? "100%" : 300,
+              opacity: 0,
             }}
             animate={{ x: 0, opacity: 1 }}
-            exit={{ 
-              x: isMobile ? "100%" : 300, 
-              opacity: 0 
+            exit={{
+              x: isMobile ? "100%" : 300,
+              opacity: 0,
             }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
