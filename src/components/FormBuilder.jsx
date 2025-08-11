@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -79,9 +79,7 @@ import { FaCopy, FaGripVertical, FaTimes } from "react-icons/fa";
 import { RiEdit2Line } from "react-icons/ri";
 import { MdOutlineEdit } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
-
 import { RiDeleteBin5Fill } from "react-icons/ri";
-
 import { MdOutlineSettingsSuggest } from "react-icons/md";
 import { TiDeleteOutline } from "react-icons/ti";
 import { VscSave } from "react-icons/vsc";
@@ -150,34 +148,43 @@ const SidebarIconButton = ({
   iconComponent,
   isActive,
   onClick,
+  isMobile = false,
 }) => {
   return (
     <motion.div
-      className={`relative flex items-center w-full p-4 rounded-xl cursor-pointer transition-all duration-300 mb-2 group ${
+      className={`relative flex items-center w-full rounded-xl cursor-pointer transition-all duration-300 mb-2 group ${
+        isMobile ? "p-2" : "p-4"
+      } ${
         isActive
           ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
           : "bg-white hover:bg-blue-50 text-gray-600 hover:text-blue-600 shadow-sm hover:shadow-md"
       }`}
       onClick={onClick}
-      whileHover={{ scale: 1.02, x: 5 }}
+      whileHover={{ scale: 1.02, x: isMobile ? 0 : 5 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
     >
       <div
-        className={`flex items-center justify-center w-10 h-10 rounded-lg mr-3 transition-all duration-300 ${
+        className={`flex items-center justify-center rounded-lg transition-all duration-300 ${
+          isMobile ? "w-8 h-8 mr-2" : "w-10 h-10 mr-3"
+        } ${
           isActive ? "bg-white/20" : "bg-blue-50 group-hover:bg-blue-100"
         }`}
       >
         {icon ? (
           <FontAwesomeIcon
             icon={icon}
-            className={`text-lg transition-all duration-300 ${
+            className={`transition-all duration-300 ${
+              isMobile ? "text-sm" : "text-lg"
+            } ${
               isActive ? "text-white" : "text-blue-600"
             }`}
           />
         ) : (
           <div
-            className={`text-lg transition-all duration-300 ${
+            className={`transition-all duration-300 ${
+              isMobile ? "text-sm" : "text-lg"
+            } ${
               isActive ? "text-white" : "text-blue-600"
             }`}
           >
@@ -186,7 +193,9 @@ const SidebarIconButton = ({
         )}
       </div>
       <span
-        className={`font-medium text-sm transition-all duration-300 ${
+        className={`font-medium transition-all duration-300 ${
+          isMobile ? "text-xs" : "text-sm"
+        } ${
           isActive ? "text-white" : "text-gray-700 group-hover:text-blue-700"
         }`}
       >
@@ -225,6 +234,7 @@ const FormBuilder = () => {
   const fields = useSelector((state) => state.form.fields);
   const activeFieldId = useSelector((state) => state.form.activeFieldId);
   const [showEditor, setShowEditor] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [formName, setFormName] = useState("Survey");
   const [formInfo, setFormInfo] = useState("Description");
   const [selectedFile, setSelectedFile] = useState(null);
@@ -236,6 +246,7 @@ const FormBuilder = () => {
   const [expirationDateTime, setExpirationDateTime] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [activeFieldType, setActiveFieldType] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   const [fieldValues, setFieldValues] = useState(
     fields.reduce((acc, field) => {
@@ -243,6 +254,18 @@ const FormBuilder = () => {
       return acc;
     }, {})
   );
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const splitFieldsByPage = (fields) => {
     const pages = [[]];
@@ -386,7 +409,7 @@ const FormBuilder = () => {
 
       const formData = {
         id: uuidv4(),
-        name: formName, // Use formName instead of headerTitle
+        name: formName,
         info: formInfo,
         fields: processedFields,
         fileUrl: fileUrl || "",
@@ -458,6 +481,9 @@ const FormBuilder = () => {
 
   const handleAddField = (type) => {
     setActiveFieldType(type);
+
+    // Close mobile sidebar after adding field
+    setShowMobileSidebar(false);
 
     switch (type) {
       case "orderTitle":
@@ -722,7 +748,7 @@ const FormBuilder = () => {
       case "dropdown":
         return (
           <select
-            className="w-full px-4 py-3 text-gray-700 transition-all duration-300 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+            className="w-full px-3 py-2 md:px-4 md:py-3 text-gray-700 transition-all duration-300 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-sm md:text-base"
             value={fieldValues[field.id]}
             onChange={(e) => handleFieldChange(field.id, e.target.value)}
           >
@@ -736,11 +762,11 @@ const FormBuilder = () => {
 
       case "Radio-group":
         return (
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
             {field.options?.map((option) => (
               <label
                 key={option.id}
-                className="flex items-center space-x-2 cursor-pointer"
+                className="flex items-center space-x-2 cursor-pointer text-sm md:text-base"
               >
                 <input
                   type="radio"
@@ -759,11 +785,11 @@ const FormBuilder = () => {
 
       case "MultipleCheckbox":
         return (
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
             {field.options?.map((option) => (
               <label
                 key={option.id}
-                className="flex items-center space-x-2 cursor-pointer"
+                className="flex items-center space-x-2 cursor-pointer text-sm md:text-base"
               >
                 <input
                   type="checkbox"
@@ -819,7 +845,7 @@ const FormBuilder = () => {
         return (
           <input
             type="file"
-            className="w-full px-4 py-3 text-gray-700 transition-all duration-300 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+            className="w-full px-3 py-2 md:px-4 md:py-3 text-gray-700 transition-all duration-300 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-sm md:text-base"
             onChange={(e) =>
               handleFieldChange(field.id, null, field.type, e.target.files[0])
             }
@@ -830,7 +856,7 @@ const FormBuilder = () => {
         return (
           <textarea
             rows="3"
-            className="w-full px-4 py-3 text-gray-700 transition-all duration-300 bg-white border-2 border-gray-200 rounded-lg resize-none focus:border-blue-500 focus:outline-none"
+            className="w-full px-3 py-2 md:px-4 md:py-3 text-gray-700 transition-all duration-300 bg-white border-2 border-gray-200 rounded-lg resize-none focus:border-blue-500 focus:outline-none text-sm md:text-base"
             value={field.value}
             placeholder={field.placeholder}
             onChange={(e) => handleFieldChange(field.id, e.target.value)}
@@ -874,7 +900,7 @@ const FormBuilder = () => {
           <div>
             <input
               type="text"
-              className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none transition-all duration-300 ${
+              className={`w-full px-3 py-2 md:px-4 md:py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none transition-all duration-300 text-sm md:text-base ${
                 showValidationErrors && validationErrors[field.id]
                   ? "border-red-500 focus:border-red-500"
                   : "border-gray-200 focus:border-blue-500"
@@ -898,7 +924,7 @@ const FormBuilder = () => {
             />
             {field.maxLength && (
               <div
-                className={`text-sm mt-2 ${
+                className={`text-xs md:text-sm mt-2 ${
                   field.value && field.value.length > field.maxLength
                     ? "text-red-500"
                     : "text-gray-500"
@@ -916,14 +942,14 @@ const FormBuilder = () => {
 
       case "checkbox":
         return (
-          <label className="flex items-center space-x-3 cursor-pointer">
+          <label className="flex items-center space-x-2 md:space-x-3 cursor-pointer">
             <input
               type="checkbox"
               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               checked={field.checked}
               onChange={(e) => handleFieldChange(field.id, e.target.checked)}
             />
-            <span className="text-gray-700">
+            <span className="text-gray-700 text-sm md:text-base">
               {field.checkboxLabel || field.label}
             </span>
           </label>
@@ -934,7 +960,7 @@ const FormBuilder = () => {
           <div>
             <input
               type="number"
-              className="w-full px-4 py-3 text-gray-700 transition-all duration-300 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 md:px-4 md:py-3 text-gray-700 transition-all duration-300 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-sm md:text-base"
               value={fieldValues[field.id]}
               required={field.required}
               placeholder={field.placeholder}
@@ -942,7 +968,7 @@ const FormBuilder = () => {
               onChange={(e) => handleFieldChange(field.id, e.target.value)}
             />
             {field.required && !fieldValues[field.id] && (
-              <div className="mt-2 text-sm text-red-500">
+              <div className="mt-2 text-xs md:text-sm text-red-500">
                 This field is required
               </div>
             )}
@@ -953,7 +979,7 @@ const FormBuilder = () => {
         return (
           <input
             type={field.type === "date" ? "date" : "text"}
-            className="w-full px-4 py-3 text-gray-700 transition-all duration-300 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+            className="w-full px-3 py-2 md:px-4 md:py-3 text-gray-700 transition-all duration-300 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-sm md:text-base"
             value={field.value}
             placeholder={field.placeholder}
             onChange={(e) => handleFieldChange(field.id, e.target.value)}
@@ -963,17 +989,98 @@ const FormBuilder = () => {
   };
 
   return (
-    <div className="min-h-screen mt-6 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Mobile Header */}
+      <div className="lg:hidden bg-white border-b border-gray-200 p-4 fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => setShowMobileSidebar(true)}
+            className="flex items-center justify-center w-10 h-10 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200"
+          >
+            <FontAwesomeIcon icon={faBars} className="text-blue-600" />
+          </button>
+          <h1 className="text-lg font-bold text-gray-800 truncate mx-4">
+            Form Builder
+          </h1>
+          <motion.button
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-md"
+            onClick={handleSave}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <VscSave className="text-sm" />
+            Save
+          </motion.button>
+        </div>
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {showMobileSidebar && (
+          <>
+            <motion.div
+              className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowMobileSidebar(false)}
+            />
+            <motion.div
+              className="fixed left-0 top-0 bottom-0 bg-white shadow-xl z-50 w-80 max-w-[90vw] lg:hidden overflow-hidden"
+              initial={{ x: -300 }}
+              animate={{ x: 0 }}
+              exit={{ x: -300 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              <div className="flex flex-col h-full">
+                {/* Mobile Sidebar Header */}
+                <div className="p-4 bg-[#3c9087] border-b-4 border-[#4b49ac] flex-shrink-0">
+                  <div className="flex items-center justify-between mb-2">
+                    <h2 className="text-xl font-bold text-[#eff6ff]">
+                      ✨ Form Elements
+                    </h2>
+                    <button
+                      onClick={() => setShowMobileSidebar(false)}
+                      className="flex items-center justify-center w-8 h-8 text-white bg-white/20 rounded-full hover:bg-white/30 transition-colors"
+                    >
+                      <FaTimes className="text-sm" />
+                    </button>
+                  </div>
+                  <p className="text-[#d1f0e8] text-sm leading-relaxed">
+                    Tap to add form elements
+                  </p>
+                </div>
+
+                {/* Mobile Field Types */}
+                <div className="flex-1 p-3 space-y-2 overflow-y-auto">
+                  {fieldTypes.map((item, idx) => (
+                    <SidebarIconButton
+                      key={item.label}
+                      icon={item.icon}
+                      iconComponent={item.iconComponent}
+                      label={item.label}
+                      isActive={activeFieldType === item.type}
+                      onClick={() => handleAddField(item.type)}
+                      isMobile={true}
+                    />
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       {/* Main Layout Container */}
-      <div className="flex h-screen">
-        {/* Left Sidebar - Field Types */}
-        <div className="flex flex-col bg-white border-r border-gray-200 shadow-xl w-80">
+      <div className="flex h-screen pt-16 lg:pt-0">
+        {/* Desktop Left Sidebar - Field Types */}
+        <div className="hidden lg:flex flex-col bg-white border-r border-gray-200 shadow-xl w-80 xl:w-96">
           {/* Sidebar Header */}
-          <div className="p-6 md:p-8 bg-[#3c9087] border-b-4 border-[#4b49ac] shadow-lg rounded-t-xl">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-[#eff6ff] mb-2 tracking-wider drop-shadow-sm">
+          <div className="p-6 xl:p-8 bg-[#3c9087] border-b-4 border-[#4b49ac] shadow-lg flex-shrink-0">
+            <h2 className="text-2xl xl:text-3xl font-extrabold text-[#eff6ff] mb-2 tracking-wider drop-shadow-sm">
               ✨ Form Elements
             </h2>
-            <p className="text-[#d1f0e8] text-base md:text-lg font-medium leading-relaxed">
+            <p className="text-[#d1f0e8] text-sm xl:text-base font-medium leading-relaxed">
               Drag <span className="text-[#fdfd96] font-semibold">and</span>{" "}
               drop to{" "}
               <span className="text-[#ffd1dc] font-semibold">build</span> your
@@ -997,18 +1104,18 @@ const FormBuilder = () => {
         </div>
 
         {/* Middle - Form Preview */}
-        <div className="flex flex-col flex-1 bg-gray-50">
+        <div className="flex flex-col flex-1 bg-gray-50 min-w-0 overflow-hidden">
           {/* Form Header */}
-          <div className="p-6 bg-white border-b border-gray-200 shadow-sm">
+          <div className="p-4 lg:p-6 bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
             <div className="max-w-4xl mx-auto">
               <input
-                className="w-full mb-3 text-3xl font-bold text-center text-gray-800 placeholder-gray-400 bg-transparent border-none focus:outline-none"
+                className="w-full mb-3 text-xl md:text-2xl lg:text-3xl font-bold text-center text-gray-800 placeholder-gray-400 bg-transparent border-none focus:outline-none"
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
                 placeholder="Enter Form Name"
               />
               <textarea
-                className="w-full text-center text-gray-600 placeholder-gray-400 bg-transparent border-none resize-none focus:outline-none"
+                className="w-full text-center text-gray-600 placeholder-gray-400 bg-transparent border-none resize-none focus:outline-none text-sm md:text-base"
                 value={formInfo}
                 onChange={(e) => setFormInfo(e.target.value)}
                 placeholder="Add form description..."
@@ -1018,17 +1125,17 @@ const FormBuilder = () => {
           </div>
 
           {/* Form Content */}
-          <div className="flex-1 p-6 overflow-y-auto">
+          <div className="flex-1 p-4 lg:p-6 overflow-y-auto">
             <div className="max-w-4xl mx-auto">
               {/* Form Fields */}
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 <DragDropContext onDragEnd={onDragEnd}>
                   <Droppable droppableId="form-fields-droppable">
                     {(provided, snapshot) => (
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`space-y-4 ${
+                        className={`space-y-3 md:space-y-4 ${
                           snapshot.isDraggingOver
                             ? "bg-blue-50 rounded-lg p-4"
                             : ""
@@ -1048,7 +1155,7 @@ const FormBuilder = () => {
                                   <motion.div
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
-                                    className={`group bg-white rounded-xl shadow-sm border border-gray-200 p-6 transition-all duration-300 hover:shadow-md ${
+                                    className={`group bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 transition-all duration-300 hover:shadow-md ${
                                       snapshot.isDragging
                                         ? "shadow-xl rotate-2"
                                         : ""
@@ -1065,25 +1172,25 @@ const FormBuilder = () => {
                                     transition={{ duration: 0.3 }}
                                     data-field-id={field.id}
                                   >
-                                    <div className="flex items-start gap-4">
-                                      {/* Drag Handle */}
+                                    <div className="flex items-start gap-2 md:gap-4">
+                                      {/* Drag Handle - Desktop Only */}
                                       <div
                                         {...provided.dragHandleProps}
-                                        className="flex-shrink-0 p-2 transition-colors duration-200 rounded-lg opacity-0 cursor-move bg-gray-50 hover:bg-blue-50 group-hover:opacity-100"
+                                        className="hidden md:flex flex-shrink-0 p-2 transition-colors duration-200 rounded-lg opacity-0 cursor-move bg-gray-50 hover:bg-blue-50 group-hover:opacity-100"
                                       >
                                         <FaGripVertical className="text-gray-400 hover:text-blue-500" />
                                       </div>
 
                                       {/* Field Content */}
                                       <div className="flex-1 min-w-0">
-                                        <div className="flex items-center justify-between mb-4">
-                                          {/* Only show label for fields that need it (not checkbox, divider, slider, rating, etc.) */}
+                                        <div className="flex items-start justify-between mb-3 md:mb-4">
+                                          {/* Field Label */}
                                           {field.type !== "checkbox" &&
                                             field.type !== "divider" &&
                                             field.type !== "slider" &&
                                             field.type !== "rating" && (
                                               <label
-                                                className="text-lg font-semibold text-gray-800"
+                                                className="text-base md:text-lg font-semibold text-gray-800 pr-2 flex-1 min-w-0"
                                                 style={{
                                                   fontWeight: field.isBold
                                                     ? "bold"
@@ -1096,64 +1203,49 @@ const FormBuilder = () => {
                                                     "#1f2937",
                                                 }}
                                               >
-                                                {field.label}
-                                                {field.required && (
-                                                  <span className="ml-1 text-red-500">
-                                                    *
-                                                  </span>
-                                                )}
+                                                <span className="block truncate">
+                                                  {field.label}
+                                                  {field.required && (
+                                                    <span className="ml-1 text-red-500">
+                                                      *
+                                                    </span>
+                                                  )}
+                                                </span>
                                               </label>
                                             )}
 
-                                          <div className="flex gap-3 transition-opacity duration-200 opacity-0 group-hover:opacity-100">
+                                          {/* Action Buttons */}
+                                          <div className="flex gap-2 md:gap-3 transition-opacity duration-200 opacity-100 md:opacity-0 md:group-hover:opacity-100 flex-shrink-0 ml-2">
                                             {/* Properties (Edit) Button */}
                                             <motion.button
                                               whileHover={{ scale: 1.08 }}
-                                              className="relative flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-indigo-400 to-blue-500 text-white rounded-full shadow-md transition-all duration-300"
+                                              whileTap={{ scale: 0.95 }}
+                                              className="flex items-center justify-center w-8 h-8 md:w-auto md:h-auto md:px-3 md:py-1.5 bg-gradient-to-r from-indigo-400 to-blue-500 text-white rounded-full shadow-md transition-all duration-300"
                                               onClick={() =>
                                                 handleEditField(field.id)
                                               }
                                               aria-label="Edit field"
                                             >
-                                              <MdOutlineSettingsSuggest className="text-lg" />
-
-                                              {/* Slide-in text on hover */}
-                                              <motion.span
-                                                initial={{ opacity: 0, x: 5 }}
-                                                whileHover={{
-                                                  opacity: 1,
-                                                  x: 8,
-                                                }}
-                                                transition={{ duration: 0.3 }}
-                                                className="absolute text-sm left-9"
-                                              >
+                                              <MdOutlineSettingsSuggest className="text-sm md:text-lg" />
+                                              <span className="hidden md:inline ml-1 text-sm">
                                                 Properties
-                                              </motion.span>
+                                              </span>
                                             </motion.button>
 
                                             {/* Delete Button */}
                                             <motion.button
                                               whileHover={{ scale: 1.08 }}
-                                              className="relative flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full shadow-md transition-all duration-300"
+                                              whileTap={{ scale: 0.95 }}
+                                              className="flex items-center justify-center w-8 h-8 md:w-auto md:h-auto md:px-3 md:py-1.5 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full shadow-md transition-all duration-300"
                                               onClick={() =>
                                                 handleDeleteField(field.id)
                                               }
                                               aria-label="Delete field"
                                             >
-                                              <RiDeleteBin5Fill className="text-lg" />
-
-                                              {/* Slide-in text on hover */}
-                                              <motion.span
-                                                initial={{ opacity: 0, x: 5 }}
-                                                whileHover={{
-                                                  opacity: 1,
-                                                  x: 8,
-                                                }}
-                                                transition={{ duration: 0.3 }}
-                                                className="absolute text-sm left-9"
-                                              >
+                                              <RiDeleteBin5Fill className="text-sm md:text-lg" />
+                                              <span className="hidden md:inline ml-1 text-sm">
                                                 Delete
-                                              </motion.span>
+                                              </span>
                                             </motion.button>
                                           </div>
                                         </div>
@@ -1166,7 +1258,7 @@ const FormBuilder = () => {
                                         {/* Validation Error Display */}
                                         {showValidationErrors &&
                                           validationErrors[field.id] && (
-                                            <div className="flex items-center p-3 mt-3 text-sm text-red-600 border border-red-200 rounded-lg bg-red-50">
+                                            <div className="flex items-center p-3 mt-3 text-xs md:text-sm text-red-600 border border-red-200 rounded-lg bg-red-50">
                                               <span className="mr-2">⚠️</span>
                                               {validationErrors[field.id]}
                                             </div>
@@ -1187,19 +1279,21 @@ const FormBuilder = () => {
 
                 {/* Empty State */}
                 {fields.length === 0 && (
-                  <div className="py-16 text-center">
-                    <div className="flex items-center justify-center w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full">
+                  <div className="py-12 md:py-16 text-center">
+                    <div className="flex items-center justify-center w-16 h-16 md:w-24 md:h-24 mx-auto mb-4 bg-gray-100 rounded-full">
                       <FontAwesomeIcon
                         icon={faPlus}
-                        className="text-2xl text-gray-400"
+                        className="text-xl md:text-2xl text-gray-400"
                       />
                     </div>
-                    <h3 className="mb-2 text-xl font-semibold text-gray-600">
+                    <h3 className="mb-2 text-lg md:text-xl font-semibold text-gray-600">
                       No fields added yet
                     </h3>
-                    <p className="text-gray-500">
-                      Select elements from the left panel to start building your
-                      form
+                    <p className="text-gray-500 text-sm md:text-base px-4">
+                      {isMobile 
+                        ? "Tap the menu button to add form elements"
+                        : "Select elements from the left panel to start building your form"
+                      }
                     </p>
                   </div>
                 )}
@@ -1207,39 +1301,39 @@ const FormBuilder = () => {
 
               {/* Page Navigation */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between p-4 mt-8 bg-white border border-gray-200 shadow-sm rounded-xl">
+                <div className="flex items-center justify-between p-3 md:p-4 mt-6 md:mt-8 bg-white border border-gray-200 shadow-sm rounded-xl">
                   <button
-                    className="px-6 py-3 font-semibold text-white transition-all duration-300 bg-blue-500 rounded-lg shadow-sm hover:bg-blue-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold text-white transition-all duration-300 bg-blue-500 rounded-lg shadow-sm hover:bg-blue-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
                     disabled={currentPage === 0}
                   >
-                    ← Previous
+                    ← <span className="hidden sm:inline">Previous</span><span className="sm:hidden">Prev</span>
                   </button>
-                  <span className="font-medium text-gray-700">
+                  <span className="font-medium text-gray-700 text-sm md:text-base px-2">
                     Page {currentPage + 1} of {totalPages}
                   </span>
                   <button
-                    className="px-6 py-3 font-semibold text-white transition-all duration-300 bg-blue-500 rounded-lg shadow-sm hover:bg-blue-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold text-white transition-all duration-300 bg-blue-500 rounded-lg shadow-sm hover:bg-blue-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     onClick={() =>
                       setCurrentPage((p) => Math.min(totalPages - 1, p + 1))
                     }
                     disabled={currentPage === totalPages - 1}
                   >
-                    Next →
+                    <span className="hidden sm:inline">Next</span><span className="sm:hidden">Next</span> →
                   </button>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Bottom Action Bar */}
-          <div className="p-4 bg-white border-t border-gray-200">
+          {/* Bottom Action Bar - Desktop Only */}
+          <div className="hidden lg:block p-4 bg-white border-t border-gray-200 flex-shrink-0">
             <div className="flex items-center justify-between max-w-4xl mx-auto">
               <div className="text-sm text-gray-500">
                 {fields.length} field{fields.length !== 1 ? "s" : ""} added
               </div>
               <motion.button
-                className="flex items-center gap-3 px-8 py-3 font-semibold text-white transition-all duration-300 rounded-lg shadow-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="flex items-center gap-3 px-6 xl:px-8 py-3 font-semibold text-white transition-all duration-300 rounded-lg shadow-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 onClick={handleSave}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -1254,17 +1348,27 @@ const FormBuilder = () => {
         {/* Right Sidebar - Field Editor */}
         {showEditor && (
           <motion.div
-            className="flex flex-col bg-white border-l border-gray-200 shadow-xl w-96"
-            initial={{ x: 300, opacity: 0 }}
+            className={`${
+              isMobile
+                ? "fixed inset-0 z-50 bg-white flex flex-col"
+                : "flex flex-col bg-white border-l border-gray-200 shadow-xl w-80 xl:w-96"
+            }`}
+            initial={{ 
+              x: isMobile ? "100%" : 300, 
+              opacity: 0 
+            }}
             animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 300, opacity: 0 }}
+            exit={{ 
+              x: isMobile ? "100%" : 300, 
+              opacity: 0 
+            }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             {/* Editor Header */}
-            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-purple-600 to-pink-600">
+            <div className="p-4 lg:p-6 border-b border-gray-200 bg-gradient-to-r from-purple-600 to-pink-600 flex-shrink-0">
               <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="mb-1 text-lg font-semibold text-white">
+                <div className="flex-1 min-w-0 mr-4">
+                  <h3 className="mb-1 text-lg xl:text-xl font-semibold text-white truncate">
                     Field Settings
                   </h3>
                   <p className="text-sm text-purple-100">
@@ -1272,17 +1376,17 @@ const FormBuilder = () => {
                   </p>
                 </div>
                 <button
-                  className="flex items-center justify-center w-8 h-8 text-white transition-all duration-300 rounded-full hover:scale-110 bg-white/20 hover:bg-white/30"
+                  className="flex items-center justify-center w-8 h-8 lg:w-10 lg:h-10 text-white transition-all duration-300 rounded-full hover:scale-110 bg-white/20 hover:bg-white/30 flex-shrink-0"
                   onClick={handleCloseEditor}
                 >
-                  <FaTimes className="text-sm" />
+                  <FaTimes className="text-sm lg:text-base" />
                 </button>
               </div>
             </div>
 
             {/* Editor Content */}
-            <div className="flex-1 p-6 overflow-y-auto">
-              <div className="space-y-6">
+            <div className="flex-1 p-4 lg:p-6 overflow-y-auto">
+              <div className="space-y-4 lg:space-y-6">
                 {activeField.type === "date" && (
                   <DateFieldEditor field={activeField} />
                 )}
@@ -1374,14 +1478,31 @@ const FormBuilder = () => {
                 )}
               </div>
             </div>
+
+            {/* Mobile Editor Footer */}
+            {isMobile && (
+              <div className="p-4 border-t border-gray-200 bg-white flex-shrink-0">
+                <button
+                  onClick={handleCloseEditor}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold transition-all duration-300 hover:from-purple-700 hover:to-pink-700 active:scale-95"
+                >
+                  Done Editing
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
       </div>
 
+      {/* Toast Container with responsive positioning */}
       <ToastContainer
-        position="bottom-right"
+        position={isMobile ? "top-center" : "bottom-right"}
         className="z-50"
         toastClassName="bg-white shadow-lg border border-gray-200"
+        style={{
+          fontSize: isMobile ? "14px" : "16px",
+          marginTop: isMobile ? "70px" : "0px",
+        }}
       />
     </div>
   );
